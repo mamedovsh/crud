@@ -3,11 +3,18 @@
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PdfGeneratorController;
+use App\Models\Log;
 
-Route::get('/users', [UserController::class, 'index']);
-Route::get('/users/{id}', [UserController::class, 'show']);
-Route::post('/users', [UserController::class, 'store']);
-Route::get('/resume/{id}', [PdfGeneratorController::class, 'index']);
+Route::middleware(['datalogger'])->group(function () {
+    Route::get('/logs', function () {
+        $logs = Log::all();
+        return view('logs', compact('logs'));
+    });
+});
+// Route::get('/users', [UserController::class, 'index']);
+// Route::get('/users/{id}', [UserController::class, 'show']);
+// Route::post('/users', [UserController::class, 'store']);
+// Route::get('/resume/{id}', [PdfGeneratorController::class, 'index']);
 // Route::get('/', function () {
 //     return view('welcome');
 // });
