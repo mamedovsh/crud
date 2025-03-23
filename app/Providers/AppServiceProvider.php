@@ -2,23 +2,22 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
+use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
+use App\Events\NewsHiddenEvent; 
+use App\Listeners\NewsHiddenListener;
+use App\Observers\NewsObserver;
 
-class AppServiceProvider extends ServiceProvider
+class EventServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     */
-    public function register(): void
-    {
-        //
-    }
+    protected $listen = [
+        NewsHiddenEvent::class => [
+            NewsHiddenListener::class,
+        ],
+    ];
 
-    /**
-     * Bootstrap any application services.
-     */
-    public function boot(): void
+    public function boot()
     {
-        //
+        News::observe(NewsObserver::class);
     }
+    
 }
