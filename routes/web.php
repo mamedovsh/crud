@@ -1,50 +1,23 @@
 <?php
 
-use App\Models\Log;
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
-use App\Models\News;
-use App\Events\NewsHidden;
+use App\Http\Controllers\UsersController;
 
+Route::get('/users', [UsersController::class, 'index']);
 
-Route::middleware(['datalogger'])->group(function () {
-    Route::get('/logs', function () {
-        $logs = Log::all();
-        return view('logs', compact('logs'));
-    });
-});
-// Route::get('/users', [UserController::class, 'index']);
-// Route::get('/users/{id}', [UserController::class, 'show']);
-// Route::post('/users', [UserController::class, 'store']);
-// Route::get('/resume/{id}', [PdfGeneratorController::class, 'index']);
-// Route::get('/', function () {
-//     return view('welcome');
-// });
-
-Route::get('/logs', function () {
-    $news = new News();
-
-    $news->title = 'Test news title';
-    $news->body = 'Test news body';
-
-    $news->save();
-    return $news;
+Route::get('/', function () {
+    return view('welcome');
 });
 
-Route::get('/news/{id}/hide', function ($id) {
-    $news = News::findOrFail($id);
-    $news->is_hidden = true;
-    $news->save();
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
 
-    NewsHidden::dispatch($news);
-
-    return response()->json(['message' => 'News hidden successfully!']);
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
-Route::get('/news/create-test', function () {
-    $news = News::create([
-        'title' => 'Test News Title',
-        'content' => 'This is the content of the test news.',
-        'is_hidden' => false,
-    ]);
 
-    return response()->json($news);
-});
+require __DIR__.'/auth.php';
