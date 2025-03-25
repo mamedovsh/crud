@@ -32,5 +32,11 @@ class RegisteredUserController extends Controller
 
         
         return redirect()->route('home')->with('success', 'Регистрация успешна!');
+
+        Telegram::sendMessage([
+            'chat_id' => env('TELEGRAM_CHANNEL_ID', ''),
+            'parse_mode' => 'html',
+            'text' => "Новый пользователь зарегистрирован: " . $request->input('name')
+        ]);
     }
 }
