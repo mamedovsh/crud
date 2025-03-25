@@ -3,6 +3,9 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UsersController;
+use App\Mail\Welcome;
+use App\Models\User;
+
 
 Route::get('/users', [UsersController::class, 'index']);
 
@@ -20,4 +23,25 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__.'/auth.php';
+Route::get('/send-welcome-email', function () {
+    
+    $user = User::find(1); 
+    
+    if ($user) {
+    Mail::to($user->email)->send(new Welcome($user));
+    return 'Welcome email has been sent!';
+    }
+    
+    return 'User not found.';
+    });
+
+    Route::get('test-telegram', function () {
+        Telegram::sendMessage([
+        'chat_id' => env('TELEGRAM_CHANNEL_ID', ''),
+        'parse_mode' => 'html',
+        'text' => 'Произошло тестовое событие'
+        ]);
+        return response()->json([
+        'status' => 'success'
+        ]);
+        });
